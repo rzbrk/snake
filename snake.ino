@@ -45,6 +45,7 @@ int food;
 //   ...
 //   9 => tick time  100 ms
 int level;
+boolean failed;
 
 // Timer value
 unsigned long tick;
@@ -156,7 +157,7 @@ int move_right(int old_pos) {
   int new_pos;
 
   if ((old_pos + 1) % (2 * NCOLS) == 16 || old_pos % (2 * NCOLS) == 16) {
-    
+    new_pos = old_pos;  
   } else {
     if ((int)floor(old_pos/NCOLS) % 2 == 0) {
       new_pos = old_pos + 1;
@@ -455,7 +456,7 @@ void loop() {
     tick = millis();
 
     // Check if we failed
-    boolean failed = check_if_failed();
+    failed = check_if_failed();
     
     if (direction == 3) {
       head = move_left(head);
