@@ -396,7 +396,7 @@ boolean check_if_failed() {
 
   // Failed, if on the right border and moving right
   if (((head + 1) % (2 * NCOLS) == 16 || head % (2 * NCOLS) == 16) && direction == 1) {
-    failed == true;
+    failed = true;
   }
   
   // Failed, if on the bottom border an moving down
