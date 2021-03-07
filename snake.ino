@@ -369,10 +369,10 @@ void update_screen(boolean failed) {
 }
 
 // ==========================================================
-// check_if_failed
+// check_if_gameover
 //
 // Description
-//   Check if game is loosed. It's the case, if we want to
+//   Check if game is over. It's the case, if we want to
 //   move outside the boundaries of the led matrix or if
 //   the head of the snake touches its tail.
 //
@@ -385,7 +385,7 @@ void update_screen(boolean failed) {
 //   boolean failed             true if failed, otherwise
 //                              false
 //
-boolean check_if_failed() {
+boolean check_if_gameover() {
   boolean failed = false;
   int last, next;
 
@@ -477,8 +477,8 @@ void loop() {
     }
   }
 
-    // Check if we failed
-    failed = check_if_failed();
+    // Check if game is over
+    failed = check_if_gameover();
     
     if (direction == 3) {
       head = move_left(head);
