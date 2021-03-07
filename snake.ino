@@ -45,7 +45,7 @@ int food;
 //   ...
 //   9 => tick time  100 ms
 int level;
-boolean failed;
+boolean gameover;
 
 // Timer value
 unsigned long tick;
@@ -402,64 +402,71 @@ void update_screen(boolean failed) {
 //                              false
 //
 boolean check_if_gameover() {
-  boolean failed = false;
-  int last, next;
+  boolean gameover = false;
+  int dir, head_next, last, next;
 
-  // Failed, if in the upper border and moving up
+  // Game over, if in the upper border and moving up
   if ((head > (NROWS * (NCOLS - 1) -1)) && direction == 0) {
-    failed = true;
+    gameover = true;
   }
 
-  // Failed, if on the right border and moving right
+  // Game over, if on the right border and moving right
   if (((head + 1) % (2 * NCOLS) == 16 || head % (2 * NCOLS) == 16) && direction == 1) {
-    failed = true;
+    gameover = true;
   }
   
-  // Failed, if on the bottom border an moving down
+  // Game over, if on the bottom border an moving down
   if ((head < NROWS) && direction == 2) {
-    failed = true;
+    gameover = true;
   }
 
-  // Failed, if on the left border and moving left
+  // Game over, if on the left border and moving left
   if (((head + 1) % (2 * NCOLS) == 0 || head % (2 * NCOLS) == 0) && direction == 3) {
-    failed = true;
+    gameover = true;
+  }
+
+  // Game over, if we suddenly change the direction by 180 degrees.
+  // This only applies, if the snake has a tail. Then, we can compare the current
+  // direction with the first element of the tail array.
+  if (tail_len > 0 && tail[0] == (direction + 2) % 4) {
+    gameover = true;
   }
 
   // Failed, if head would touch the tail if moving further
   // Therefore, we first calculate the following head position and check,
-  // if it touches the current head position or any position in the tail.
-  int head_next = mmove(head, direction);
+  // if it touches any position in the tail.
+  head_next = mmove(head, direction);
 
   // Now, loop over the snake
   for (int l = 0; l < tail_len; l++) {
+    // The first tail element of the snake is calculated relative to the head position.
+    // The following tail elements are calculated relative to the previous tail element
+    // position.
     if (l == 0) {
       last = head;
     } else {
       last = next;
     }
-    
-    if (tail[l] == 3) {
-      next = move_right(last);
-    } else if (tail[l] == 2) {
-      next = move_up(last);
-    } else if (tail[l] == 0) {
-      next = move_down(last);
-    } else if (tail[l] == 1) {
-      next = move_left(last);
-    }
-    
-    if (head == next) {
-      failed = true;
+
+    // The array tail does not contain the "coordinates" of the tail elements, but
+    // directions, from which the tail coordintes have to be calculated. This is
+    // done in the following line by updating the variable next.
+    // IMPORTANT: The directions in tail have to be rotated by 180 degrees, first!
+    next = mmove(last, (tail[l] + 2) % 4 );
+
+    // Now, check if head_next would touch the current computed snake element (next)
+    if (head_next == next) {
+      gameover = true;
       break;
     }
   }
 
   if (DEBUG) {
-    Serial.print("Failed? ");
-    Serial.println(failed);
+    Serial.print("Game over? ");
+    Serial.println(gameover);
   }
 
-  return failed;
+  return gameover;
 }
 
 // ==========================================================
@@ -499,7 +506,7 @@ void loop() {
   }
 
     // Check if game is over
-    failed = check_if_gameover();
+    gameover = check_if_gameover();
 
     // Move head
     head = mmove(head, direction);
@@ -519,6 +526,6 @@ void loop() {
 
     print_tail();
     
-    update_screen(failed);
+    update_screen(gameover);
   } 
 }
