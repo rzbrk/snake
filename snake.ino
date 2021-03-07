@@ -452,8 +452,30 @@ void loop() {
     if (DEBUG) {
       Serial.println("=== tick ===");
     }
-    
+
+    // Set tick to current time
     tick = millis();
+
+  // Read serial port and update direction, if input available
+  if (Serial.available() > 0) {
+    int inchar=Serial.read();
+    //Serial.print("I received: ");
+    //Serial.println(inchar);
+    
+    // h => left
+    if (inchar == 104) {
+      direction = 3;
+    // j => down
+    } else if (inchar == 106) {
+      direction = 2;
+    // k => up
+    } else if (inchar == 107) {
+      direction = 0;
+    // l => right
+    } else if (inchar == 108) {
+      direction = 1;
+    }
+  }
 
     // Check if we failed
     failed = check_if_failed();
@@ -484,26 +506,5 @@ void loop() {
     print_tail();
     
     update_screen(failed);
-  }
-
-  if (Serial.available() > 0) {
-    int inchar=Serial.read();
-    //Serial.print("I received: ");
-    //Serial.println(inchar);
-    
-    // h => left
-    if (inchar == 104) {
-      direction = 3;
-    // j => down
-    } else if (inchar == 106) {
-      direction = 2;
-    // k => up
-    } else if (inchar == 107) {
-      direction = 0;
-    // l => right
-    } else if (inchar == 108) {
-      direction = 1;
-    }
-  }
-  
+  } 
 }
