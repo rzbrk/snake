@@ -225,6 +225,22 @@ int move_down(int old_pos) {
   return new_pos;
 }
 
+int mmove(int old_pos, int direction) {
+  int new_pos;
+  
+  if (direction == 3) {
+    new_pos = move_left(old_pos);
+  } else if (direction == 2) {
+    new_pos = move_down(old_pos);
+  } else if (direction == 0) {
+    new_pos = move_up(old_pos);
+  } else {
+    new_pos = move_right(old_pos);
+  }
+
+  return new_pos;
+}
+
 // ==========================================================
 // place_food
 //
@@ -409,7 +425,12 @@ boolean check_if_gameover() {
     failed = true;
   }
 
-  // Failed, if head touches tail
+  // Failed, if head would touch the tail if moving further
+  // Therefore, we first calculate the following head position and check,
+  // if it touches the current head position or any position in the tail.
+  int head_next = mmove(head, direction);
+
+  // Now, loop over the snake
   for (int l = 0; l < tail_len; l++) {
     if (l == 0) {
       last = head;
@@ -479,17 +500,10 @@ void loop() {
 
     // Check if game is over
     failed = check_if_gameover();
-    
-    if (direction == 3) {
-      head = move_left(head);
-    } else if (direction == 2) {
-      head = move_down(head);
-    } else if (direction == 0) {
-      head = move_up(head);
-    } else {
-      head = move_right(head);
-    }
 
+    // Move head
+    head = mmove(head, direction);
+    
     if (head == food) {
       food = place_food();
       tail_len++;
